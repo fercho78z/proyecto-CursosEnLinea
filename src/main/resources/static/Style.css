@@ -1,0 +1,9 @@
+@charset "ISO-8859-1";
+.navbar{
+	padding:0 10px;
+}
+.message{
+	position:obsulute;
+	top:40px;
+	right:5px;
+}
