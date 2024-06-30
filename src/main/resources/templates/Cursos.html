@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="https://www.thymeleaf.org">
+<html lang="en" xmlns:th="https://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
 
 <head>
 <link rel="stylesheet"
@@ -26,11 +26,14 @@
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 		<a class="navbar-brand" th:href="@{/cursos}">Gestion de Cursos</a>
 		<div class="collapse navbar-collapse">
-			<ul class="	navbar-nav mr-auto">
+			<ul class="	navbar-nav mr-auto" sec:authorize="hasRole('ADMIN')">
 				<li class="nav-item"><a class="nav-link" th:href="@{/cursos}">Cursos</a></li>
 				<li class="nav-item"><a class="nav-link"
 					th:href="@{/cursos/nuevo}">Agregar Cursos</a></li>
 			</ul>
+			<form th:action="@{/logout}" method="post">
+            	<input type="submit" value="Sign Out"/>
+       		 </form>
 		</div>
 	</nav>
 </header>
@@ -94,7 +97,7 @@
 						<th>Descripcion</th>
 						<th>Nivel</th>
 						<th>Publicacion</th>
-						<th cols="2">Acciones</th>
+						<th cols="2" sec:authorize="hasRole('ADMIN')">Acciones</th>
 
 					</tr>
 				</thead>
@@ -109,7 +112,7 @@
 							class="fa-regular fa-square-check"></a> <a
 							th:if="*{curso.Publicado==false}"
 							class="fa-regular fa-square icon-dark"></a></td>
-						<td><a th:href="@{'/cursos/editar/'+${curso.id}}"
+						<td sec:authorize="hasRole('ADMIN')"><a th:href="@{'/cursos/editar/'+${curso.id}}"
 							title="Editar curso"
 							class="fa-regular fa-pen-to-square icon-dark btn btn-primary"></a>
 							<a th:href="@{'/cursos/eliminar/'+${curso.id}}"
@@ -207,6 +210,5 @@
 				window.location.href="?page="+currentPage+"&size="+pageSize;
 			}
 		</script>
-
 </body>
 </html>

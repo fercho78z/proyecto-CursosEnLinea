@@ -39,54 +39,44 @@ public class CursosController {
 	@Autowired
 	private CursosRepository cursosR;
 
-	@GetMapping("/cursos")
-	public String listarCursos(Model modelo,@PageableDefault(size=5,page=0) Pageable pageable) {
-		/*try {
-			List<Cursos> cursos = new ArrayList<>();
-			Pageable paging = PageRequest.of(page - 1, size);
-			Page<Cursos> pageCursos = null;
-			if (keyword == null) {
-				pageCursos = cursosR.findAll(paging);
-				
-			} else {
-				pageCursos = cursosR.findByTitulo(keyword, paging);
-				modelo.addAttribute("keyword", keyword);
-			}
-			cursos = pageCursos.getContent();
-			modelo.addAttribute("cursos", cursos);
-			modelo.addAttribute("currentPage", pageCursos.getNumber() + 1);
-			modelo.addAttribute("totalItems", pageCursos.getTotalElements());
-			modelo.addAttribute("totalPages", pageCursos.getTotalPages());
-			modelo.addAttribute("pageSize", size);
-		} catch (Exception exception) {
-			modelo.addAttribute("Message Error:", exception.getMessage());
-		}*/
+	@GetMapping({ "/cursos", "/" })
+	public String listarCursos(Model modelo, @PageableDefault(size = 5, page = 0) Pageable pageable) {
+		/*
+		 * try { List<Cursos> cursos = new ArrayList<>(); Pageable paging =
+		 * PageRequest.of(page - 1, size); Page<Cursos> pageCursos = null; if (keyword
+		 * == null) { pageCursos = cursosR.findAll(paging);
+		 * 
+		 * } else { pageCursos = cursosR.findByTitulo(keyword, paging);
+		 * modelo.addAttribute("keyword", keyword); } cursos = pageCursos.getContent();
+		 * modelo.addAttribute("cursos", cursos); modelo.addAttribute("currentPage",
+		 * pageCursos.getNumber() + 1); modelo.addAttribute("totalItems",
+		 * pageCursos.getTotalElements()); modelo.addAttribute("totalPages",
+		 * pageCursos.getTotalPages()); modelo.addAttribute("pageSize", size); } catch
+		 * (Exception exception) { modelo.addAttribute("Message Error:",
+		 * exception.getMessage()); }
+		 */
 		List<Cursos> cursos = new ArrayList<>();
 		Page<Cursos> pageCursos = cursosR.findAll(PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()));
-		modelo.addAttribute("page",pageCursos);
-		var currentPage= pageCursos.getNumber();
-		var totalPages=pageCursos.getTotalPages();
-		var start= Math.max(1, currentPage);
-		var end = Math.min(currentPage+5, totalPages);
+		modelo.addAttribute("page", pageCursos);
+		var currentPage = pageCursos.getNumber();
+		var totalPages = pageCursos.getTotalPages();
+		var start = Math.max(1, currentPage);
+		var end = Math.min(currentPage + 5, totalPages);
 		cursos = pageCursos.getContent();
 		modelo.addAttribute("cursos", cursos);
-		
-		if(totalPages>0) {
-			
-			List<Integer> pageNumbers=new ArrayList<>();
-			for(int i=start;i<=end; i++) {
+
+		if (totalPages > 0) {
+
+			List<Integer> pageNumbers = new ArrayList<>();
+			for (int i = start; i <= end; i++) {
 				pageNumbers.add(i);
 			}
-			modelo.addAttribute("pageNumber",pageNumbers);
+			modelo.addAttribute("pageNumber", pageNumbers);
 		}
-		
-		List<Integer> pageSizeOption=Arrays.asList(5,10,50,100);
-		modelo.addAttribute("pageSizeOption",pageSizeOption);
 
-		
-		
-		
-		
+		List<Integer> pageSizeOption = Arrays.asList(5, 10, 50, 100);
+		modelo.addAttribute("pageSizeOption", pageSizeOption);
+
 		return "cursos";
 	}
 
@@ -94,8 +84,8 @@ public class CursosController {
 	 * //Listar cursos sin paginacion
 	 * 
 	 * @GetMapping("/cursos") public String listarCursos(Model modelo) {
-	 * modelo.addAttribute("cursos", cursosS.ListarTodosLosCursos()); 
-	 * return "cursos"; }
+	 * modelo.addAttribute("cursos", cursosS.ListarTodosLosCursos()); return
+	 * "cursos"; }
 	 */
 
 	@GetMapping("/cursos/nuevo")
@@ -167,6 +157,12 @@ public class CursosController {
 		List<Cursos> cursos = cursosR.findAll();
 		CursoExportExcel exporterExcel = new CursoExportExcel(cursos);
 		exporterExcel.export(response);
+	}
+
+	@PostMapping("/logout")
+	public String performLogout() {
+	    // .. perform logout
+	    return "/index";
 	}
 
 }

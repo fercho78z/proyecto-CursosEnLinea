@@ -18,7 +18,6 @@ import com.lowagie.text.pdf.PdfWriter;
 
 import jakarta.servlet.http.HttpServletResponse;
 
-
 public class CursoExportPDF {
 
 	private List<Cursos> lstCursos;
@@ -27,34 +26,36 @@ public class CursoExportPDF {
 		super();
 		this.lstCursos = lstCursos;
 	}
+
 	private void writeTableHeader(PdfPTable pdfTable) {
-		PdfPCell cell=new PdfPCell();
+		PdfPCell cell = new PdfPCell();
 		cell.setBackgroundColor(Color.BLUE);
 		cell.setPadding(5);
 		Font font = FontFactory.getFont(FontFactory.HELVETICA);
 		font.setColor(Color.WHITE);
-		cell.setPhrase(new Phrase("ID",font));
+		cell.setPhrase(new Phrase("ID", font));
 		pdfTable.addCell(cell);
-		cell.setPhrase(new Phrase("Titulo",font));
+		cell.setPhrase(new Phrase("Titulo", font));
 		pdfTable.addCell(cell);
-		cell.setPhrase(new Phrase("Descripcion",font));
+		cell.setPhrase(new Phrase("Descripcion", font));
 		pdfTable.addCell(cell);
-		cell.setPhrase(new Phrase("Nivel",font));
+		cell.setPhrase(new Phrase("Nivel", font));
 		pdfTable.addCell(cell);
-		cell.setPhrase(new Phrase("Publicado",font));
+		cell.setPhrase(new Phrase("Publicado", font));
 		pdfTable.addCell(cell);
-		
+
 	}
+
 	private void writeTableData(PdfPTable table) {
-		for(Cursos curso:lstCursos) {
+		for (Cursos curso : lstCursos) {
 			table.addCell(String.valueOf(curso.getId()));
 			table.addCell(curso.getTitulo());
 			table.addCell(curso.getDescripcion());
 			table.addCell(String.valueOf(curso.getNivel()));
-			table.addCell(String.valueOf(curso.getPublicado()));	
+			table.addCell(String.valueOf(curso.getPublicado()));
 		}
 	}
-	
+
 	public void export(HttpServletResponse response) throws DocumentException, IOException {
 		Document document = new Document(PageSize.A4);
 		PdfWriter.getInstance(document, response.getOutputStream());
@@ -62,19 +63,18 @@ public class CursoExportPDF {
 		Font font = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
 		font.setSize(18);
 		font.setColor(Color.BLUE);
-		Paragraph p = new Paragraph("Lista de Cursos",font);
+		Paragraph p = new Paragraph("Lista de Cursos", font);
 		p.setAlignment(Paragraph.ALIGN_CENTER);
 		document.add(p);
-		PdfPTable table= new PdfPTable(5);
+		PdfPTable table = new PdfPTable(5);
 		table.setWidthPercentage(100);
-		table.setWidths(new float[] {1.3f,3.5f,2.0f,1.5f,1.5f});
+		table.setWidths(new float[] { 1.3f, 3.5f, 2.0f, 1.5f, 1.5f });
 		table.setSpacingBefore(10);
-		
+
 		writeTableHeader(table);
 		writeTableData(table);
 		document.add(table);
 		document.close();
 	}
-	
+
 }
-	

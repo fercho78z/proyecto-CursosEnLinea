@@ -6,12 +6,12 @@ import org.springframework.stereotype.Service;
 import com.app.cursos.entity.Cursos;
 import com.app.cursos.repository.CursosRepository;
 
-
 @Service
-public class CursoServicesImp implements CursoServices{
-	
+public class CursoServicesImp implements CursoServices {
+
 	@Autowired
 	private CursosRepository cursoR;
+
 	@Override
 	public List<Cursos> ListarTodosLosCursos() {
 		// TODO Auto-generated method stub
@@ -31,8 +31,8 @@ public class CursoServicesImp implements CursoServices{
 
 	@Override
 	public Cursos actCurso(Integer Id, Cursos curso) {
-		Cursos cursoBD=cursoR.findById(Id).orElse(null);
-		if(cursoBD !=null) {
+		Cursos cursoBD = cursoR.findById(Id).orElse(null);
+		if (cursoBD != null) {
 			cursoBD.setNivel(curso.getNivel());
 			cursoBD.setTitulo(curso.getTitulo());
 			cursoBD.setDescripcion(curso.getDescripcion());

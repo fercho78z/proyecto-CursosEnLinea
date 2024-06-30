@@ -8,5 +8,5 @@ import com.app.cursos.entity.Cursos;
 
 public interface CursosRepository extends JpaRepository<Cursos, Integer> {
 
-	  Page<Cursos> findByTitulo(String keyword,Pageable pageable);
+	Page<Cursos> findByTitulo(String keyword, Pageable pageable);
 }
