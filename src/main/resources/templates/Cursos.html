@@ -18,7 +18,7 @@
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
 	integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
 	crossorigin="anonymous" referrerpolicy="no-referrer" />
-<link rel="stylesheet" type="text/css" th:href="@{/css/Style.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{../Style.css}" />
 <title>Insert title here</title>
 <meta charset="UTF-8">
 </head>
@@ -127,14 +127,6 @@
 			Mostrando <span th:text="${page.size}"></span> de <span th:text="${page.totalElements}"></span> registros
 			</p>
 			<nav aria-label="Pagination" class="d-flex jsutify-content-between">
-				<div>
-				<!--	<select id="pageSize" name="size" class="form-control" onchange="changePageSize()">
-					
-						<option th:each="s : ${ {5, 10, 20} }" th:value="${s}" th:text="${s}" th:selected="${s == pageSize}"></option>
-						 <option th:each="size : ${pageSizeOption}" th:value="${size}" th:text="${size}" th:selected="${page.size==size}"/>
-					</select>-->
-				
-				</div>
 				<ul class="pagination justify-content-center">
 				<li class="page-item" th:classappend="${page.first} ? 'disabled':''">
 				<a class="page-link" th:href="@{'?page=0&size=' + ${page.size}}">Primera</a>
@@ -159,50 +151,6 @@
 			
 		</div>
 	</div>
-	<!--
-	<div class="container" th:unless="${cursos.size()<0}">
-		<nav aria-label="Pagination" th:if="${totalPages>0}">
-			<ul class="pagination justify-content-center">
-				<li class="page-item"
-					th:classappend="${currentPage == 1} ? 'disabled'">
-					 <span th:text="@{<<}"></span>
-				</a> 
-				</li>
-
-				<li class="page-item font-weight-bold"
-					th:classappend="${currentPage==1}?'disabled'">
-					 <span
-						th:text="@{'Anterior'}"></span>
-				</a>
-				</li>
-				<li class="page-item disabled" th:if="${currentPage-2>1}"><a
-					class="page-link" href="#">...</a>
-				</li>
-				<li class="page-item" th:classappend="${page == currentPage}?'active'" th:each="page : ${currentPage > 2} ? ${currentPage - 2} : 1,${currentPage + 2 < totalPages} ? ${currentPage + 2 }: ${totalPages}">
-					<!-- <a class="page-link"
-					th:href="@{'/cursos?'+${keyword !=null && keyword !=''} ? @{'keyword='}+${keyword} + @{'&'} : ''} + @{'page='} + ${currentPage+1} + @{'&'} + @{'size='}+${pageSize}"
-					th:title="@{'Siguiente pagina'}" rel="tooltip"> <span
-						th:text="@{'Siguiente'}"></span>
-				</a>
-				</li>
-							<li class="page-item"th:classappend="${page == currentPage}?'active'"
-								th:each="page : ${#numbers.sequence(currentPage > 2 ? currentPage - 2 : 1,currentPage + 2 < totalPages ? currentPage + 2 : totalPages)}">
-								<a th:replace="fragment/paging :: paging(${page},${page},'Page'+${page})"></a>
-							</li>
-							<li class="page-item disabled" th:if="${currentPage+2>totalPages}">
-								<a class="page-link" href="#">...</a>
-							</li>
-							<li class="page-item font-weight-bold" th:classappend="${currentPage==1}?'disabled'">
-								<a th:replace="fragment/paging :: paging(${currentPage + 1},'Siguiente','Siguiente pagina'})"></a>
-							</li>
-							<li class="page-item font-weight-bold" th:classappend="${currentPage==1}?'disabled'">
-								<a th:replace="fragment/paging :: paging(${currentPage + 1},'Siguiente','Siguiente pagina'})"></a>
-							</li>
-							<li class="page-item" th:classappend="${currentPage==totalPages}?'disabled'">
-								<a th:replace="fragment/paging :: paging(${currentPage + 1},'>>','Ultima pagina'})"></a>
-							</li>
-			</ul>
-		</nav>-->
 		<script type="text/javascript">
 			function changePageSize() {
 				const pageSize=document.getElementById("pageSize").value;

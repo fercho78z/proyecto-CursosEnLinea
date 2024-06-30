@@ -3,6 +3,7 @@ package com.app.cursos.security;
 import java.beans.Customizer;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -11,12 +12,16 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.logout.CookieClearingLogoutHandler;
 import org.springframework.security.web.authentication.logout.HeaderWriterLogoutHandler;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.csrf.CsrfAuthenticationStrategy;
 import org.springframework.security.web.header.writers.ClearSiteDataHeaderWriter;
 import org.springframework.security.web.header.writers.ClearSiteDataHeaderWriter.Directive;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+
+
 
 @Configuration
 @EnableWebSecurity
@@ -24,11 +29,11 @@ public class WebSecurityConfig {
 
 	@Bean
 	protected InMemoryUserDetailsManager userDetailsManager() {
-		UserDetails user1 = User.builder().username("user4")
+		UserDetails user1 = User.builder().username("user1")
 				.password("{bcrypt}$2a$10$6zFeVKeUn2glTJV/gL78guCvuIyKTnvcIdvShPhNzBHZXEaTan8..").roles("USER").build();
-		UserDetails user2 = User.builder().username("admin1")
-				.password("{bcrypt}$2a$10$6zFeVKeUn2glTJV/gL78guCvuIyKTnvcIdvShPhNzBHZXEaTan8..").roles("ADMIN")
-				.build();
+		UserDetails user2 = User.builder().username("admin2")
+				.password("{bcrypt}$2a$10$6zFeVKeUn2glTJV/gL78guCvuIyKTnvcIdvShPhNzBHZXEaTan8..").roles("ADMIN").build();
+				
 
 		return new InMemoryUserDetailsManager(user1, user2);
 	}
@@ -36,14 +41,14 @@ public class WebSecurityConfig {
 	@Bean
 	protected SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
 		HeaderWriterLogoutHandler clearSiteData = new HeaderWriterLogoutHandler(new ClearSiteDataHeaderWriter(Directive.COOKIES));
-		CookieClearingLogoutHandler cookies = new CookieClearingLogoutHandler("our-custom-cookie");
+		CookieClearingLogoutHandler cookies = new CookieClearingLogoutHandler("JSESSIONID");
 		httpSecurity
 				.authorizeHttpRequests(auth -> auth
 						.requestMatchers("/cursos").permitAll()
 						.requestMatchers("/cursos/nuevo").hasAnyRole("ADMIN")
-						.requestMatchers("/cursos/editar/*", "/cursos/eliminar/*").hasRole("ADMIN")
+						.requestMatchers("/cursos/editar","/cursos/editar/*","/cursos/eliminar", "/cursos/eliminar/*").hasRole("ADMIN")
 						.anyRequest().authenticated())
-				
+				.httpBasic(org.springframework.security.config.Customizer.withDefaults())
 				.logout((logout) -> logout.logoutUrl("/src/main/resources/templates/logout")
 											.logoutSuccessUrl("/index")
 											.addLogoutHandler(cookies)
@@ -51,11 +56,19 @@ public class WebSecurityConfig {
 											.deleteCookies("JSESSIONID")
 											.addLogoutHandler(clearSiteData)
 				.logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler()))
-				.httpBasic(org.springframework.security.config.Customizer.withDefaults())
-				.csrf(csrf -> csrf.disable()).exceptionHandling(e -> e.accessDeniedPage("/403"));
+				.logout(org.springframework.security.config.Customizer.withDefaults())
+				.csrf(csrf -> csrf.disable())
+				.exceptionHandling(e -> e.accessDeniedHandler(customAccessDeniedHandler()));
 
 		return httpSecurity.build();
 
 	}
-
+	
+	@Bean
+	AccessDeniedHandler customAccessDeniedHandler() {
+	    return (request, response, accessDeniedException) -> {
+	    	response.sendRedirect("/403");
+	    	//.exceptionHandling(e -> e.accessDeniedPage("/403"));
+	    };
+	}
 }
