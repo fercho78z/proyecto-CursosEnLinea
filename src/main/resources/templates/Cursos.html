@@ -31,9 +31,14 @@
 				<li class="nav-item"><a class="nav-link"
 					th:href="@{/cursos/nuevo}">Agregar Cursos</a></li>
 			</ul>
-			<form th:action="@{/logout}" method="post">
-            	<input type="submit" value="Sign Out"/>
-       		 </form>
+		
+       		 <div align="center">
+        <p th:inline="text">Bienvenido <span sec:authentication="name"></span></p>
+        <form th:action="@{/logout}" method="post">
+           <a href="#" onclick="this.parentNode.submit();">Logout</a>
+        </form>
+       		 </div>
+       		 
 		</div>
 	</nav>
 </header>

@@ -1,26 +1,57 @@
 package com.app.cursos.config;
 
-import org.springframework.context.annotation.ComponentScan;
+
+import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
+import org.springframework.web.servlet.i18n.SessionLocaleResolver;
+
+import java.util.Locale;
+
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
+//import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-@EnableWebSecurity
-@ComponentScan
+@EnableWebMvc
 public class WebMvcConfig implements org.springframework.web.servlet.config.annotation.WebMvcConfigurer {
 
-	public void addViewController(ViewControllerRegistry registry) {
+	@Override
+	public void addViewControllers(ViewControllerRegistry registry) {
 		registry.addViewController("/403").setViewName("403");
-		
-
+		registry.addViewController("/login");
 	}
 	
+	
+@Bean
+public LocaleResolver localResolver() {
+	
+	SessionLocaleResolver slr=new SessionLocaleResolver();
+	slr.setDefaultLocale(new Locale("es"));
+	return slr;
+	
+}
+	
+	@Bean
+	public LocaleChangeInterceptor localeChangeInterceptor() {
+		
+		LocaleChangeInterceptor lci= new LocaleChangeInterceptor();
+		lci.setParamName("lang");
+		return lci;
+		
+	}
+	
+	@Override
+	public void addInterceptors(InterceptorRegistry interceptor) {
+		interceptor.addInterceptor(localeChangeInterceptor());
+		
+	}
+	
+
+
+
+
 
 }

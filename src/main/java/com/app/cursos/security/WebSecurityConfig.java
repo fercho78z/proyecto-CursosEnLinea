@@ -21,10 +21,13 @@ import org.springframework.security.web.header.writers.ClearSiteDataHeaderWriter
 import org.springframework.security.web.header.writers.ClearSiteDataHeaderWriter.Directive;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
+import lombok.RequiredArgsConstructor;
+
 
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class WebSecurityConfig {
 
 	@Bean
@@ -44,19 +47,23 @@ public class WebSecurityConfig {
 		CookieClearingLogoutHandler cookies = new CookieClearingLogoutHandler("JSESSIONID");
 		httpSecurity
 				.authorizeHttpRequests(auth -> auth
-						.requestMatchers("/cursos").permitAll()
+						.requestMatchers("/").hasAnyRole("ADMIN","USER")
+						.requestMatchers("/cursos").hasAnyRole("ADMIN","USER")
 						.requestMatchers("/cursos/nuevo").hasAnyRole("ADMIN")
 						.requestMatchers("/cursos/editar","/cursos/editar/*","/cursos/eliminar", "/cursos/eliminar/*").hasRole("ADMIN")
 						.anyRequest().authenticated())
-				.httpBasic(org.springframework.security.config.Customizer.withDefaults())
-				.logout((logout) -> logout.logoutUrl("/src/main/resources/templates/logout")
+				//.formLogin(org.springframework.security.config.Customizer.withDefaults())
+				.formLogin(form->form.loginPage("/login").permitAll())
+				//.httpBasic(org.springframework.security.config.Customizer.withDefaults())
+				/*.logout((logout) -> logout.logoutUrl("/src/main/resources/templates/logout")
 											.logoutSuccessUrl("/index")
-											.addLogoutHandler(cookies)
+											//.addLogoutHandler(cookies)
 											.invalidateHttpSession(true)
-											.deleteCookies("JSESSIONID")
-											.addLogoutHandler(clearSiteData)
-				.logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler()))
-				.logout(org.springframework.security.config.Customizer.withDefaults())
+											.deleteCookies("remove")
+											.clearAuthentication(true)
+											.addLogoutHandler(clearSiteData))*/
+				//.logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler()))
+				//.logout(org.springframework.security.config.Customizer.withDefaults())
 				.csrf(csrf -> csrf.disable())
 				.exceptionHandling(e -> e.accessDeniedHandler(customAccessDeniedHandler()));
 

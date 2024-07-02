@@ -160,7 +160,7 @@ public class CursosController {
 		exporterExcel.export(response);
 	}
 
-	@PostMapping("/logout")
+/*	@PostMapping("/logout")
 	public String performLogout() {
 	    // .. perform logout
 	    return "/index";
@@ -175,5 +175,5 @@ public class CursosController {
 	public String performErrorGet() {
 	    return "/403";
 	}
-	
+	*/
 }
