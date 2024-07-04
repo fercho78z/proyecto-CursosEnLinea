@@ -1,25 +1,21 @@
 package com.app.cursos.security;
 
-import java.beans.Customizer;
 
+import javax.sql.DataSource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.HttpBasicConfigurer;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.logout.CookieClearingLogoutHandler;
 import org.springframework.security.web.authentication.logout.HeaderWriterLogoutHandler;
-import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
-import org.springframework.security.web.csrf.CsrfAuthenticationStrategy;
 import org.springframework.security.web.header.writers.ClearSiteDataHeaderWriter;
 import org.springframework.security.web.header.writers.ClearSiteDataHeaderWriter.Directive;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+
 
 import lombok.RequiredArgsConstructor;
 
@@ -30,15 +26,17 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class WebSecurityConfig {
 
-	@Bean
-	protected InMemoryUserDetailsManager userDetailsManager() {
-		UserDetails user1 = User.builder().username("user1")
-				.password("{bcrypt}$2a$10$6zFeVKeUn2glTJV/gL78guCvuIyKTnvcIdvShPhNzBHZXEaTan8..").roles("USER").build();
-		UserDetails user2 = User.builder().username("admin2")
-				.password("{bcrypt}$2a$10$6zFeVKeUn2glTJV/gL78guCvuIyKTnvcIdvShPhNzBHZXEaTan8..").roles("ADMIN").build();
-				
-
-		return new InMemoryUserDetailsManager(user1, user2);
+	@Autowired
+	private DataSource dataSource;
+	
+	@Autowired
+	public void configAuth (AuthenticationManagerBuilder builder) throws Exception {
+		builder.jdbcAuthentication()
+		.passwordEncoder(new BCryptPasswordEncoder())
+		.dataSource(dataSource)
+		.usersByUsernameQuery("select username, password, estado_enabled from users where username=?")
+		.authoritiesByUsernameQuery("select username,role from users where username=?");
+		
 	}
 
 	@Bean
@@ -53,7 +51,7 @@ public class WebSecurityConfig {
 						.requestMatchers("/cursos/editar","/cursos/editar/*","/cursos/eliminar", "/cursos/eliminar/*").hasRole("ADMIN")
 						.anyRequest().authenticated())
 				//.formLogin(org.springframework.security.config.Customizer.withDefaults())
-				.formLogin(form->form.loginPage("/login").permitAll())
+				.formLogin(form->form.loginPage("/login").permitAll()	)
 				//.httpBasic(org.springframework.security.config.Customizer.withDefaults())
 				/*.logout((logout) -> logout.logoutUrl("/src/main/resources/templates/logout")
 											.logoutSuccessUrl("/index")

@@ -1,5 +1,4 @@
 package com.app.cursos.entity;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -90,4 +89,6 @@ public class Cursos {
 		this.Publicado = Publicado;
 	}
 
+	
+	
 }
