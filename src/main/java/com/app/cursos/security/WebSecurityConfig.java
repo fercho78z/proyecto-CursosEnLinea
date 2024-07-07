@@ -2,12 +2,16 @@ package com.app.cursos.security;
 
 
 import javax.sql.DataSource;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
@@ -16,6 +20,7 @@ import org.springframework.security.web.authentication.logout.HeaderWriterLogout
 import org.springframework.security.web.header.writers.ClearSiteDataHeaderWriter;
 import org.springframework.security.web.header.writers.ClearSiteDataHeaderWriter.Directive;
 
+import com.app.cursos.services.UserDetailsServiceImpl;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,19 +31,38 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class WebSecurityConfig {
 
-	@Autowired
-	private DataSource dataSource;
-	
-	@Autowired
-	public void configAuth (AuthenticationManagerBuilder builder) throws Exception {
-		builder.jdbcAuthentication()
-		.passwordEncoder(new BCryptPasswordEncoder())
-		.dataSource(dataSource)
-		.usersByUsernameQuery("select username, password, estado_enabled from users where username=?")
-		.authoritiesByUsernameQuery("select username,role from users where username=?");
+	@Bean	
+	public UserDetailsService userDetailsService() {
 		
+		return new UserDetailsServiceImpl();
+	}
+	
+	@Bean
+	public BCryptPasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
 	}
 
+	//implementa el autenticacion de usarios de base de datos con el provedor Dao
+	// y verifica y autentica las credenciales del usuario
+	@Bean 
+	public DaoAuthenticationProvider authenticationProvider() {
+		DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
+		daoAuthenticationProvider.setUserDetailsService(userDetailsService());
+		daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
+		return daoAuthenticationProvider;
+	} 
+	
+	//usa el provide pata responder a la petiocion 
+	@Bean
+	public AuthenticationManager authenticationManager(HttpSecurity httpSecurity) throws Exception {
+		
+		AuthenticationManagerBuilder authenticationManager= httpSecurity.getSharedObject(AuthenticationManagerBuilder.class);
+		authenticationManager.authenticationProvider(authenticationProvider());
+		
+		return authenticationManager.build();
+	}
+	
+	//define reglas de auth a traves de http
 	@Bean
 	protected SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
 		HeaderWriterLogoutHandler clearSiteData = new HeaderWriterLogoutHandler(new ClearSiteDataHeaderWriter(Directive.COOKIES));
