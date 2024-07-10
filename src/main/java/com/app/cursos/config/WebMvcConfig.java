@@ -21,7 +21,9 @@ public class WebMvcConfig implements org.springframework.web.servlet.config.anno
 	@Override
 	public void addViewControllers(ViewControllerRegistry registry) {
 		registry.addViewController("/403").setViewName("403");
+		registry.addViewController("/logout").setViewName("logout");
 		registry.addViewController("/login");
+		
 	}
 	
 	

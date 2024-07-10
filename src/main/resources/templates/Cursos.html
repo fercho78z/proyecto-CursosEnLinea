@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="https://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<html lang="en" xmlns:th="https://www.thymeleaf.org"
+	xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
 
 <head>
 <link rel="stylesheet"
@@ -26,19 +27,26 @@
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 		<a class="navbar-brand" th:href="@{/cursos}">Gestion de Cursos</a>
 		<div class="collapse navbar-collapse">
-			<ul class="	navbar-nav mr-auto" sec:authorize="hasRole('ADMIN')">
+			<ul class="	navbar-nav mr-auto" sec:authorize="hasAnyAuthority('ADMIN','EDITOR')">
 				<li class="nav-item"><a class="nav-link" th:href="@{/cursos}">Cursos</a></li>
 				<li class="nav-item"><a class="nav-link"
 					th:href="@{/cursos/nuevo}">Agregar Cursos</a></li>
 			</ul>
-		
-       		 <div align="center">
-        <p th:inline="text">Bienvenido <span sec:authentication="name"></span></p>
-        <form th:action="@{/logout}" method="post">
-           <a href="#" onclick="this.parentNode.submit();">Logout</a>
-        </form>
-       		 </div>
-       		 
+			
+			
+
+			<div class="navbar-brand" align="center" sec:authorize="isAuthenticated()">
+				<p th:inline="text">
+					Bienvenido <span sec:authentication="name">Username</span>
+				</p>
+				<p th:inline="text">
+					Role <span sec:authentication="principal.authorities">Roles</span>
+				</p>
+				<form name="logoutForm" th:action="@{/logout}" method="post">
+        <a th:href="@{/logout}" onclick="this.parentNode.submit();">Logout</a>
+    </form>
+			</div>
+
 		</div>
 	</nav>
 </header>
@@ -67,8 +75,9 @@
 						<label class="input-group-text" for="pageSize"> Elementos
 							por pagina</label>
 					</div>
-					 <select name="size" id="pageSize" class="form-control" onchange="changePageSize()">
-							<option th:each="s : ${pageSizeOption}" th:value="${s}"
+					<select name="size" id="pageSize" class="form-control"
+						onchange="changePageSize()">
+						<option th:each="s : ${pageSizeOption}" th:value="${s}"
 							th:text="${s}" th:selected="${page.size == s}"></option>
 						<!-- <option th:each="s : ${ {5, 10, 20} }" th:value="${s}"
 							th:text="${s}" th:selected="${s == pageSize}"></option>
@@ -90,8 +99,9 @@
 		</div>
 		<br>
 		<p>
-			Mostrando <span th:text="${page.size}"></span> de <span th:text="${page.totalElements}"></span> registros
-			</p>
+			Mostrando <span th:text="${page.size}"></span> de <span
+				th:text="${page.totalElements}"></span> registros
+		</p>
 
 		<div class="container">
 			<table class="table table-hover table-responsive-xl">
@@ -102,7 +112,7 @@
 						<th>Descripcion</th>
 						<th>Nivel</th>
 						<th>Publicacion</th>
-						<th cols="2" sec:authorize="hasRole('ADMIN')">Acciones</th>
+						<th cols="2" sec:authorize="hasAnyAuthority('ADMIN','EDITOR')">Acciones</th>
 
 					</tr>
 				</thead>
@@ -117,46 +127,55 @@
 							class="fa-regular fa-square-check"></a> <a
 							th:if="*{curso.Publicado==false}"
 							class="fa-regular fa-square icon-dark"></a></td>
-						<td sec:authorize="hasRole('ADMIN')"><a th:href="@{'/cursos/editar/'+${curso.id}}"
-							title="Editar curso"
-							class="fa-regular fa-pen-to-square icon-dark btn btn-primary"></a>
+						<td> <div sec:authorize="hasAnyAuthority('ADMIN','EDITOR')"><a 
+							th:href="@{'/cursos/editar/'+${curso.id}}" title="Editar curso"
+							class="fa-regular fa-pen-to-square icon-dark btn btn-primary"></a></div>
+							<div sec:authorize="hasAnyAuthority('ADMIN','CREATOR')">
 							<a th:href="@{'/cursos/eliminar/'+${curso.id}}"
 							title="Eliminar curso" id="btnDelete"
-							class="fa-regular fa-trash-can icon-dark btn btn-secundary"></a></td>
+							class="fa-regular fa-trash-can icon-dark btn btn-secundary"></a></div></td>
 					</tr>
 
 				</tbody>
 
 			</table>
 			<p>
-			Mostrando <span th:text="${page.size}"></span> de <span th:text="${page.totalElements}"></span> registros
+				Mostrando <span th:text="${page.size}"></span> de <span
+					th:text="${page.totalElements}"></span> registros
 			</p>
 			<nav aria-label="Pagination" class="d-flex jsutify-content-between">
 				<ul class="pagination justify-content-center">
-				<li class="page-item" th:classappend="${page.first} ? 'disabled':''">
-				<a class="page-link" th:href="@{'?page=0&size=' + ${page.size}}">Primera</a>
-				</li>	
-				<li class="page-item" th:classappend="${page.first} ? 'disabled':''">
-				<a class="page-link" th:with="prevPage=${page.number - 1}" th:href="@{'?page=' + ${prevPage}+ '&size='+${page.size}}">Anterior</a>
-				</li>
-				<li class="page-item" th:each="i : ${pageNumber}" th:classappend="${i == page.number + 1} ? 'active':''">
-				<a class="page-link" th:with="pageNum=${i - 1}" th:href="@{'?page=' + ${pageNum} + '&size='+ ${page.size}}" th:text="${i}"></a>
-				</li>	
-				<li class="page-item" th:classappend="${page.last} ? 'disabled':''">
-				<a class="page-link" th:with="nextPage=${page.number + 1}" th:href="@{'?page=' + ${nextPage} + '&size=' + ${page.size}}">Siguiente</a>
-				</li>					
-				<li class="page-item" th:classappend="${page.last} ? 'disabled':''">
-				<a class="page-link" th:with="lastPage=${page.totalPages - 1}"  th:href="@{'?page=' + ${lastPage} + '&size=' + ${page.size}}">Ultima</a>
-				</li>	
-				
+					<li class="page-item"
+						th:classappend="${page.first} ? 'disabled':''"><a
+						class="page-link" th:href="@{'?page=0&size=' + ${page.size}}">Primera</a>
+					</li>
+					<li class="page-item"
+						th:classappend="${page.first} ? 'disabled':''"><a
+						class="page-link" th:with="prevPage=${page.number - 1}"
+						th:href="@{'?page=' + ${prevPage}+ '&size='+${page.size}}">Anterior</a>
+					</li>
+					<li class="page-item" th:each="i : ${pageNumber}"
+						th:classappend="${i == page.number + 1} ? 'active':''"><a
+						class="page-link" th:with="pageNum=${i - 1}"
+						th:href="@{'?page=' + ${pageNum} + '&size='+ ${page.size}}"
+						th:text="${i}"></a></li>
+					<li class="page-item" th:classappend="${page.last} ? 'disabled':''">
+						<a class="page-link" th:with="nextPage=${page.number + 1}"
+						th:href="@{'?page=' + ${nextPage} + '&size=' + ${page.size}}">Siguiente</a>
+					</li>
+					<li class="page-item" th:classappend="${page.last} ? 'disabled':''">
+						<a class="page-link" th:with="lastPage=${page.totalPages - 1}"
+						th:href="@{'?page=' + ${lastPage} + '&size=' + ${page.size}}">Ultima</a>
+					</li>
+
 				</ul>
-				
-				
+
+
 			</nav>
-			
+
 		</div>
 	</div>
-		<script type="text/javascript">
+	<script type="text/javascript">
 			function changePageSize() {
 				const pageSize=document.getElementById("pageSize").value;
 				const currentPage = [[${page.number}]];

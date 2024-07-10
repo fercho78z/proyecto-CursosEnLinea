@@ -85,6 +85,11 @@
 			<artifactId>CRUD-SpringBoot-1</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>com.app.crud</groupId>
+			<artifactId>CRUD-SpringBoot</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 	<dependency>
       <groupId>org.springframework.boot</groupId>

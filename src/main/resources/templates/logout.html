@@ -28,8 +28,8 @@
     <div>
         <h2>Formulario de autenticación</h2>
     </div>
-    <div th:if="${param.error}">
-        <h3>Username o password inválidos</h3>
+   <div th:if="${param.logout}">
+        <h3>Ha cerrado su sesión con éxito</h3>
     </div>
 
         <form th:action="@{/login}" method="post">

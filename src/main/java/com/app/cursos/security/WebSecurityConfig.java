@@ -1,9 +1,5 @@
 package com.app.cursos.security;
 
-
-import javax.sql.DataSource;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,10 +11,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
-import org.springframework.security.web.authentication.logout.CookieClearingLogoutHandler;
-import org.springframework.security.web.authentication.logout.HeaderWriterLogoutHandler;
-import org.springframework.security.web.header.writers.ClearSiteDataHeaderWriter;
-import org.springframework.security.web.header.writers.ClearSiteDataHeaderWriter.Directive;
+import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 
 import com.app.cursos.services.UserDetailsServiceImpl;
 
@@ -52,7 +45,7 @@ public class WebSecurityConfig {
 		return daoAuthenticationProvider;
 	} 
 	
-	//usa el provide pata responder a la petiocion 
+	//usa el provide para responder a la peticion 
 	@Bean
 	public AuthenticationManager authenticationManager(HttpSecurity httpSecurity) throws Exception {
 		
@@ -65,20 +58,19 @@ public class WebSecurityConfig {
 	//define reglas de auth a traves de http
 	@Bean
 	protected SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
-		HeaderWriterLogoutHandler clearSiteData = new HeaderWriterLogoutHandler(new ClearSiteDataHeaderWriter(Directive.COOKIES));
-		CookieClearingLogoutHandler cookies = new CookieClearingLogoutHandler("JSESSIONID");
 		httpSecurity
 				.authorizeHttpRequests(auth -> auth
-						.requestMatchers("/").hasAnyRole("ADMIN","USER")
-						.requestMatchers("/cursos").hasAnyRole("ADMIN","USER")
-						.requestMatchers("/cursos/nuevo").hasAnyRole("ADMIN")
-						.requestMatchers("/cursos/editar","/cursos/editar/*","/cursos/eliminar", "/cursos/eliminar/*").hasRole("ADMIN")
+						.requestMatchers("/").hasAnyAuthority("ADMIN","USER","EDITOR","CREATOR")
+						.requestMatchers("/cursos").hasAnyAuthority("ADMIN","USER","EDITOR","CREATOR")
+						.requestMatchers("/cursos/nuevo").hasAnyAuthority("ADMIN","EDITOR")
+						.requestMatchers("/cursos/editar","/cursos/editar/*","/cursos/eliminar", "/cursos/eliminar/*").hasAnyAuthority("ADMIN","CREATOR")
 						.anyRequest().authenticated())
 				//.formLogin(org.springframework.security.config.Customizer.withDefaults())
-				.formLogin(form->form.loginPage("/login").permitAll()	)
+				.formLogin(form->form.loginPage("/login").permitAll())
 				//.httpBasic(org.springframework.security.config.Customizer.withDefaults())
-				/*.logout((logout) -> logout.logoutUrl("/src/main/resources/templates/logout")
-											.logoutSuccessUrl("/index")
+				.logout((logout) -> logout.logoutUrl("/logout").deleteCookies("JSESSIONID").logoutSuccessUrl("/logout").logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler()))
+				
+											/*.logoutSuccessUrl("/index")
 											//.addLogoutHandler(cookies)
 											.invalidateHttpSession(true)
 											.deleteCookies("remove")

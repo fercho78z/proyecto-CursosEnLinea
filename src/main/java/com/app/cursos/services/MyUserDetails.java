@@ -1,7 +1,11 @@
 package com.app.cursos.services;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+
+import com.app.cursos.entity.Roles;
 import com.app.cursos.entity.Users;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -27,8 +31,14 @@ public class MyUserDetails implements UserDetails{
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		// TODO Auto-generated method stub
-		SimpleGrantedAuthority authority =  new SimpleGrantedAuthority(user.getRole());
-		return Arrays.asList(authority);
+		Set<Roles> role= user.getRoles();
+		List<SimpleGrantedAuthority> authority =  new ArrayList<>();
+		
+		for (Roles roles:role) {
+			authority.add(new SimpleGrantedAuthority(roles.getName()));
+		}
+		
+		return authority;
 	}
 
 	@Override
